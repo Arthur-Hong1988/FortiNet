@@ -1,0 +1,132 @@
+# FMGRegisteredDevices.py
+1.FMG -> System Settings -> Administrators
+1) create a API user
+2) get the API key
+
+2.create Environment Variable in Powershell to store sensitive information
+setx FMG_API_KEY "ech7mdkdcqad61omfg7qw8fsi8sggd1y"
+setx FMG_IP "10.81.253.253"
+
+3.check environment variable
+PS C:\Users\lhong01> $env:FMG_API_KEY
+ech7mdkdcqad61omfg7qw8fsi8sggd1y
+PS C:\Users\lhong01> $env:FMG_IP
+10.81.253.253
+
+4.If Pycharm could not get the environment variable, please restart the Pycharm.
+
+item["platform_str"]方式如果某台设备没有会报错KeyError: 'platform_str'
+item.get("platform_str")会返回 None，不会把整个程序中断。
+
+# output result
+[{'adom': 'Retail_ANZ',
+  'hostname': 'ANZ-FortiLab',
+  'ip': '10.47.250.90',
+  'platform': 'FortiGate-60F',
+  'sn': 'FGT60FTK21034529'},
+ {'adom': 'Retail_ANZ',
+  'hostname': 'KSA234',
+  'ip': '10.47.251.96',
+  'platform': 'FortiGate-70G',
+  'sn': 'FGT70GTK25062737'},
+  ...
+  ...
+ ]
+
+
+#################################################################################
+# FGTStorteDevices.py
+# output of FGTStoreDevices
+Enter storecode: OC0368
+Enter your username: lhong01
+Enter your password:
+{'AP': [{'hostname': 'OC0368.AP1.Ceiling.Stock Room',
+         'platform': 'FortiAP-231K',
+         'sn': 'FP231K5N2509JQ83'},
+        {'hostname': 'OC0368.AP3.Ceiling.Stock Room',
+         'platform': 'FortiAP-231K',
+         'sn': 'FP231K5N2509JSQG'},
+        {'hostname': 'OC0368.AP2.Ceiling.Sales Area',
+         'platform': 'FortiAP-231K',
+         'sn': 'FP231K5N2509JUN5'}],
+ 'FGT': {'hostname': 'OC0368',
+         'ip': '10.47.250.88',
+         'platform': 'FortiGate-60F',
+         'sn': 'FGT60FTK2309CA2K'},
+ 'SW': [{'hostname': 'S124FFTF23011994',
+         'platform': 'FortiSwitch-124F-FPOE',
+         'sn': 'S124FFTF23011994'}],
+ 'adom': 'Retail_China',
+ 'storecode': 'OC0368'}
+
+
+#################################################################################
+# Tunnel_status_check.py
+# 处理get vpn ipsec tunnel summary命令输出
+'Tunnel1' 118.143.78.53:0  selectors(total,up): 1/0  rx(pkt,err): 0/0  tx(pkt,err): 0/0
+'Tunnel2' 118.143.56.203:4500  selectors(total,up): 1/1  rx(pkt,err): 1567/0  tx(pkt,err): 3823/1
+'Tunnel3' 203.127.132.72:0  selectors(total,up): 1/0  rx(pkt,err): 0/0  tx(pkt,err): 0/0
+'Tunnel4' 118.201.206.60:4500  selectors(total,up): 1/1  rx(pkt,err): 41562/0  tx(pkt,err): 57864/0
+
+ pattern = r"'([^']+)'.*?selectors\(total,up\):\s*\d+/(\d+)"
+'([^']+)'     .*?     selectors\(total,up\):     \s*     \d+     /     (\d+)
+   ↓           ↓               ↓                  ↓       ↓             ↓
+Tunnel名称    中间任意内容     固定文字              空格    total            up
+^'：在 [] 里面表示“不是单引号”
+
+# 代码输出
+Enter adomname: Retail_ANZ
+Enter your username: lhong01
+Enter your password:
+[{'connection': 'Authentication failed', 'storecode': 'ANZ-FortiLab'},
+ {'Tunnel1': 'up',
+  'Tunnel2': 'up',
+  'Tunnel3': 'up',
+  'Tunnel4': 'up',
+  'storecode': 'KSA234'},
+ {'Tunnel1': 'up', 'Tunnel3': 'up', 'storecode': 'KSA234OSR'},
+ {'Tunnel1': 'up',
+  'Tunnel2': 'up',
+  'Tunnel3': 'up',
+  'Tunnel4': 'up',
+  'storecode': 'KSFA238'},
+ {'Tunnel1': 'up',
+  'Tunnel2': 'up',
+  'Tunnel3': 'up',
+  'Tunnel4': 'up',
+  'storecode': 'KSFA239'},
+ {'connection': 'Authentication failed', 'storecode': 'OCFA219OSR'},
+ ]
+
+# 写入表格
+
+
+
+#################################################################################
+# FGTStoreDevices-New.py
+FortiSwitch info: execute switch-controller get-conn-status
+Managed-devices in current vdom root:
+FortiLink interface : fortilink
+SWITCH-ID                             VERSION           STATUS         FLAG   ADDRESS              JOIN-TIME            SERIAL
+C4317                                 v7.4.9 (946)      Authorized/Up   2    10.255.1.2      Mon Oct 12 11:00:09 2026    S148FFTF25007963
+
+         Flags: C=config sync, U=upgrading, S=staged, D=delayed reboot pending, E=config sync error, 2=L2, 3=L3, V=VXLAN, T=tunnel, X=External
+         Managed-Switches: 1 (UP: 1 DOWN: 0 MAX: 24)
+
+FortiAp info: show wireless-controller wtp
+config wireless-controller wtp
+    edit "FP431GTY25018521"
+        set uuid a1570988-ec3c-51f0-cc40-8382112531ea
+        set admin enable
+        set name "C4317.Sales.Area.Cabinet.AP01"
+        set wtp-profile "ANZ-Store-Wireless"
+        config radio-1
+        end
+        config radio-2
+        end
+        config radio-3
+        end
+    next
+end
+
+
